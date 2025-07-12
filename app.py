@@ -3,10 +3,9 @@ import pickle
 import pandas as pd
 import requests
 
-
 # Function to fetch movie details using OMDB API
 def fetch_movie_details(movie_id):
-    url = f"http://www.omdbapi.com/?t={movie_id}&apikey={'fb92d22b'}"
+    url = f"http://www.omdbapi.com/?t={movie_id}&apikey=fb92d22b"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -21,8 +20,15 @@ def fetch_movie_details(movie_id):
 
         return poster, description, cast, rating, genre, release_date, runtime
 
-    return "https://via.placeholder.com/300x450.png?text=No+Image", 'No description available.', 'No cast available.', 'No rating', 'No genre', 'No release date', 'No runtime available'
-
+    return (
+        "https://via.placeholder.com/300x450.png?text=No+Image",
+        'No description available.',
+        'No cast available.',
+        'No rating',
+        'No genre',
+        'No release date',
+        'No runtime available'
+    )
 
 # Function to recommend movies based on similarity
 def recommend(movie):
@@ -52,8 +58,16 @@ def recommend(movie):
         recommended_movies_release_dates.append(release_date)
         recommended_movies_runtimes.append(runtime)
 
-    return recommended_movies, recommended_movies_posters, recommended_movies_descriptions, recommended_movies_casts, recommended_movies_ratings, recommended_movies_genres, recommended_movies_release_dates, recommended_movies_runtimes
-
+    return (
+        recommended_movies,
+        recommended_movies_posters,
+        recommended_movies_descriptions,
+        recommended_movies_casts,
+        recommended_movies_ratings,
+        recommended_movies_genres,
+        recommended_movies_release_dates,
+        recommended_movies_runtimes
+    )
 
 # Load movies and similarity data
 movies_dict = pickle.load(open('movie_dict.pkl', 'rb'))
@@ -72,13 +86,21 @@ selected_movie_name = st.selectbox(
 if st.button('Recommend'):
     with st.spinner('Fetching recommendations...'):
         try:
-            names, posters, descriptions, casts, ratings, genres, release_dates, runtimes = recommend(
-                selected_movie_name)
+            (
+                names,
+                posters,
+                descriptions,
+                casts,
+                ratings,
+                genres,
+                release_dates,
+                runtimes
+            ) = recommend(selected_movie_name)
 
             cols = st.columns(5)
             for idx, col in enumerate(cols):
                 with col:
-                    st.image(posters[idx], use_column_width=True)
+                    st.image(posters[idx], use_container_width=True)  # ✅ Fixed deprecation warning
                     st.markdown(f"**{names[idx]}**")
                     st.markdown(f"⭐ IMDb Rating: {ratings[idx]}")
                     st.markdown(f"🎭 Genre: {genres[idx]}")
